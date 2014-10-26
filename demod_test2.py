@@ -24,7 +24,7 @@ def full_demod(demod, os):
     # pl.colorbar()
 
     rr = np.sqrt(xx * xx + yy * yy)
-    rr[rr>128*os/2-1] = 128*os/2-1
+    rr[rr>128*os/2-10] = 128*os/2-10
 
     rr0 = np.floor(rr)
     rr1 = np.ceil(rr)
@@ -40,7 +40,7 @@ def full_demod(demod, os):
 
     print out.min()
 
-    out[out < .1] = .1
+    # out[out < .1] = .1
 
     # pl.figure()
     # pl.imshow(out)
@@ -107,7 +107,7 @@ kspace = np.fft.fftshift(im)
 kspace = np.fft.fft2(kspace)
 kspace = np.fft.ifftshift(kspace)
 
-(traj, dens) = radial_2d(50, 161)
+(traj, dens) = radial_2d(200, 161)
 
 gridder = Gridder()
 data = gridder.igrid_2d(kspace, traj)
@@ -118,6 +118,9 @@ im1 = np.fft.ifft2(im1)
 im1 = np.fft.ifftshift(im1)
 
 im1 = im1/demod
+
+
+im1 = crop_ratio(im1, os)
 
 pl.imshow(abs(im1))
 pl.show()
