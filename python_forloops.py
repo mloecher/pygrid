@@ -25,13 +25,15 @@ class GMPythonForLoops():
             ymax = int(np.ceil(y + kernel.krad))
             for iy in range(ymin, ymax + 1):
                 if iy >= 0 and iy < kspace.shape[1]:
-                    dy = y - iy
+                    dy = abs(y - iy)
+                    kvy = kernel.get_kval(dy)
                     for ix in range(xmin, xmax + 1):
                         if ix >= 0 and ix < kspace.shape[0]:
-                            dx = x - ix
-                            dr = np.sqrt(dx * dx + dy * dy)
-                            kval = kernel.get_kval(dr)
-                            data.flat[i] += kval * kspace[ix, iy]
+                            dx = abs(x - ix)
+                            kvx = kernel.get_kval(dx)
+                            # dr = np.sqrt(dx * dx + dy * dy)
+                            # kval = kernel.get_kval(dr)
+                            data.flat[i] += kvx * kvy * kspace[ix, iy]
         return data
 
     def grid_2d(self, data, grid_params, kernel, trajectory, density=1.0):
@@ -48,11 +50,13 @@ class GMPythonForLoops():
             ymax = int(np.ceil(y + kernel.krad))
             for iy in range(ymin, ymax + 1):
                 if iy >= 0 and iy < kspace.shape[1]:
-                    dy = y - iy
+                    dy = abs(y - iy)
+                    kvy = kernel.get_kval(dy)
                     for ix in range(xmin, xmax + 1):
                         if ix >= 0 and ix < kspace.shape[0]:
-                            dx = x - ix
-                            dr = np.sqrt(dx * dx + dy * dy)
-                            kval = kernel.get_kval(dr)
-                            kspace[ix, iy] += data.flat[i] * density.flat[i] * kval
+                            dx = abs(x - ix)
+                            kvx = kernel.get_kval(dx)
+                            # dr = np.sqrt(dx * dx + dy * dy)
+                            # kval = kernel.get_kval(dr)
+                            kspace[ix, iy] += data.flat[i] * density.flat[i] * kvx * kvy
         return kspace

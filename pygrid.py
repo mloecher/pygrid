@@ -18,13 +18,13 @@ class GridParams:
 
     # Kernel defaults:
     kernel_type = 'kaiser_bessel'
-    krad = 1.5
+    krad = 4.5
     grid_mod = 100
-    over_samp = 1.25
+    over_samp = 4.0
 
     # Image defaults:
     imsize = (128, 128)
-
+    imsize_os = tuple([x * over_samp for x in imsize])
 
 class GridMethod:
     """This is a parent class for all of the individual gridding methods"""
@@ -51,18 +51,31 @@ class Gridder:
     def igrid_FT(self, im):
         im = zeropad_ratio(im, self.grid_params.over_samp)
 
+        pl.imshow(abs(im))
+        pl.show()
+
+        im = im / self.kernel.deapp
+
         kspace = np.fft.fftshift(im)
         kspace = np.fft.fft2(kspace)
         kspace = np.fft.ifftshift(kspace)
+
+        pl.imshow(np.log(abs(kspace)))
+        pl.show()
 
         return self.grid_method.igrid_2d(kspace, self.grid_params, self.kernel, self.traj)
 
     def grid_FT(self, data):
         kspace = self.grid_method.grid_2d(data, self.grid_params, self.kernel, self.traj, self.dens)
 
+        pl.imshow(np.log(abs(kspace)))
+        pl.show()
+
         im = np.fft.fftshift(kspace)
         im = np.fft.ifft2(im)
         im = np.fft.ifftshift(im)
+
+        im = im / self.kernel.deapp
 
         im = crop_ratio(im, self.grid_params.over_samp)
 
@@ -76,35 +89,41 @@ if __name__ == "__main__":
     xx, yy = np.meshgrid(x, y)
     rr = np.sqrt(xx * xx + yy * yy)
     im = np.zeros((128, 128))
-    im[rr < .4] = 2.0
-    im[rr < .3] = 1.0
+    im[rr < .45] = 1.0
+    # im[rr < .3] = .8
+    # im[rr < .2] = .6
 
-    (traj, dens) = radial_2d(20, 161)
+    # im = np.zeros((128, 128))
+    # im[10:118, 10:118] = 1.0
+
+    (traj, dens) = radial_2d(128, 256)
+
+    print traj.shape
 
     gridder = Gridder(traj, dens)
 
     data = gridder.igrid_FT(im)
-    im1 = gridder.grid_FT(data)
 
-    # pl.plot(abs(data[0]))
-    pl.imshow(abs(im)/abs(im1))
+    pl.plot(abs(data[0]))
+    pl.plot(abs(data[10]))
+    pl.plot(dens[0])
     pl.show()
 
-    sys.exit()
 
-    k1 = gridder.grid_2d(data, traj, dens)
+    print dens
+    print dens.shape
+    print abs(data[0]).max()
 
-    im1 = np.fft.fftshift(k1)
-    im1 = np.fft.ifft2(im1)
-    im1 = np.fft.ifftshift(im1)
+    im1 = gridder.grid_FT(data)
 
-    # pl.plot(abs(data[0]))
-    # pl.show()
+    diff = abs(im)/abs(im1)
+    center = diff.shape[0]/2
 
-    # pl.imshow(np.log(abs(k1)))
-    # pl.imshow(abs(im1))
-    # pl.show()
+    pl.figure()
+    pl.plot(diff[center,:])
 
-    demod = abs(im)/abs(im1)
-    pl.plot(demod[:,96])
+    pl.figure()
+    # pl.imshow(abs(im)/abs(im1), cmap=pl.gray())
+    pl.imshow(abs(im1), cmap=pl.gray())
+    pl.colorbar()
     pl.show()
