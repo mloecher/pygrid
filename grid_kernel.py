@@ -5,11 +5,12 @@ import numpy as np
 class GridKernel():
 
     def __init__(self, grid_params):
-        self.calc_kernel_ones(grid_params)
+        self.krad = grid_params.krad
+        self.calc_kernel_kb(grid_params)
 
         self.fourier_demod(grid_params)
         self.calc_deapp(grid_params)
-        self.krad = grid_params.krad
+
 
     def get_kval(self, dr):
         if dr >= self.krad:
@@ -44,6 +45,9 @@ class GridKernel():
         self.kx = x
         self.ky = y
 
+        pl.figure()
+        pl.plot(y)
+
     def calc_kernel_tri(self, grid_params):
 
         kr = grid_params.krad
@@ -74,19 +78,20 @@ class GridKernel():
 
         for i in range(1, self.kx.size):
             temp = self.ky[i] * 2 * \
-                np.exp(2 * 1j * np.pi * Dx / xres * self.kx[i])
+                np.exp(2 * 1j * np.pi * Dx / xres * self.kx[i] )
             Dy += temp
 
         Dy = Dy.real
-        Dy = Dy - Dy.min()
-        Dy = Dy / Dy.max()
-        Dy = Dy + 1e-3
+        Dy = Dy + self.ky[0]
+        Dy = Dy / self.kx.size
 
+        pl.figure()
         pl.plot(Dy)
-        pl.show()
 
         self.Dx = Dx
         self.Dy = Dy
+
+
 
     def calc_deapp(self, grid_params):
         test = np.dot(self.Dy[np.newaxis, :].T, self.Dy[np.newaxis, :])
@@ -95,27 +100,27 @@ class GridKernel():
         # pl.colorbar()
         # pl.show()
 
-        demod = self.Dy[self.Dy.size / 2:]
-
-        x = np.arange(grid_params.imsize_os[0]) - grid_params.imsize_os[0] / 2
-        y = np.arange(grid_params.imsize_os[1]) - grid_params.imsize_os[1] / 2
-        xx, yy = np.meshgrid(x, y)
-        rr = np.sqrt(xx * xx + yy * yy)
-
-        rr = np.sqrt(xx * xx + yy * yy)
-        rr[rr > grid_params.imsize_os[0] / 2 -
-            1] = grid_params.imsize_os[0] / 2 - 1
-
-        rr0 = np.floor(rr)
-        rr1 = np.ceil(rr)
-
-        y0 = demod[rr0.flatten().astype('int')]
-        y1 = demod[rr1.flatten().astype('int')]
-
-        drr = (rr - rr0).flatten()
-
-        out = (1 - drr) * y0 + drr * y1
-
-        out = out.reshape(grid_params.imsize_os)
+        # demod = self.Dy[self.Dy.size / 2:]
+        #
+        # x = np.arange(grid_params.imsize_os[0]) - grid_params.imsize_os[0] / 2
+        # y = np.arange(grid_params.imsize_os[1]) - grid_params.imsize_os[1] / 2
+        # xx, yy = np.meshgrid(x, y)
+        # rr = np.sqrt(xx * xx + yy * yy)
+        #
+        # rr = np.sqrt(xx * xx + yy * yy)
+        # rr[rr > grid_params.imsize_os[0] / 2 -
+        #     1] = grid_params.imsize_os[0] / 2 - 1
+        #
+        # rr0 = np.floor(rr)
+        # rr1 = np.ceil(rr)
+        #
+        # y0 = demod[rr0.flatten().astype('int')]
+        # y1 = demod[rr1.flatten().astype('int')]
+        #
+        # drr = (rr - rr0).flatten()
+        #
+        # out = (1 - drr) * y0 + drr * y1
+        #
+        # out = out.reshape(grid_params.imsize_os)
 
         self.deapp = test
