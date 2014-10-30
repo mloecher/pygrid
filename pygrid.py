@@ -18,9 +18,9 @@ class GridParams:
 
     # Kernel defaults:
     kernel_type = 'kaiser_bessel'
-    krad = 4.5
+    krad = 1.5
     grid_mod = 100
-    over_samp = 4.0
+    over_samp = 2.0
 
     # Image defaults:
     imsize = (128, 128)
