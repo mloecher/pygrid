@@ -6,6 +6,7 @@ class GridKernel():
 
     def __init__(self, grid_params):
         self.krad = grid_params.krad
+        self.grid_mod = grid_params.grid_mod
         self.calc_kernel_kb(grid_params)
 
         self.fourier_demod(grid_params)
@@ -27,6 +28,16 @@ class GridKernel():
             # (dr - self.kx[i - 1]) / (self.kx[i] - self.kx[i - 1])
             return y
 
+    def get_kval_vec(self, dr):
+        i = dr / self.krad * self.grid_mod
+        ri = np.floor(i).astype('int')
+        di = i - ri
+
+        y = self.ky[ri] * (1-di) + self.ky[ri+1] * di
+
+        return y
+
+
     def calc_kernel_kb(self, grid_params):
 
         kw0 = 2.0 * grid_params.krad / grid_params.over_samp
@@ -36,11 +47,14 @@ class GridKernel():
             np.sqrt((kw0 * (grid_params.over_samp - 0.5)) ** 2 - 0.8)
 
         x = np.linspace(0, kr, grid_params.grid_mod)
-
+        print x
         x_bess = np.sqrt(1 - (x / kr) ** 2)
 
         y = np.i0(beta * x_bess)
         y = y / y[0]
+
+        x = np.concatenate((x, np.array([0.0, ])))
+        y = np.concatenate((y, np.array([0.0, ])))
 
         self.kx = x
         self.ky = y

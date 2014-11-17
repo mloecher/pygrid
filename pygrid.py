@@ -4,6 +4,7 @@ from trajectories import radial_2d
 from grid_methods import simple_igrid2d
 from grid_kernel import GridKernel
 from python_forloops import *
+from python_vectors import *
 from utils import *
 import sys
 import numpy as np
@@ -20,7 +21,7 @@ class GridParams:
     kernel_type = 'kaiser_bessel'
     krad = 2.5
     grid_mod = 16
-    over_samp = 1.5
+    over_samp = 2.5
 
     # Image defaults:
     imsize = (128, 128)
@@ -45,7 +46,8 @@ class Gridder:
         self.traj = trajectory
         self.dens = density
 
-        self.grid_method = GMPythonForLoops()
+        # self.grid_method = GMPythonForLoops()
+        self.grid_method = GMPythonVectors()
         self.grid_method.setup()
 
     def igrid_FT(self, im):
@@ -96,7 +98,7 @@ if __name__ == "__main__":
     # im = np.zeros((128, 128))
     # im[10:118, 10:118] = 1.0
 
-    (traj, dens) = radial_2d(32, 201)
+    (traj, dens) = radial_2d(24, 151)
 
     print traj.shape
 
