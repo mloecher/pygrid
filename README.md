@@ -9,6 +9,6 @@ The goal is to make a python module for gridding, with:
     - Cython/openMP
     - pyCUDA
     - outside libraries linked in
-- Flexible kernel and deappodization kernel choices
+- Flexible kernel and deappodization choices
 - Methods to pick the best implementation/kernel for a given trajectory
     - Benchmarking and RMSE measures across the various techniques

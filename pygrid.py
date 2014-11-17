@@ -10,7 +10,9 @@ import sys
 import numpy as np
 import pylab as pl
 
+
 class GridParams:
+
     """ This is class to hold all of the important gridding parameters.
 
     It could probably just be a dictionary, but maybe we willl need some
@@ -27,7 +29,9 @@ class GridParams:
     imsize = (128, 128)
     imsize_os = tuple([x * over_samp for x in imsize])
 
+
 class GridMethod:
+
     """This is a parent class for all of the individual gridding methods"""
 
     def __init__(self):
@@ -35,6 +39,7 @@ class GridMethod:
 
     def setup(self):
         pass
+
 
 class Gridder:
 
@@ -68,7 +73,8 @@ class Gridder:
         return self.grid_method.igrid_2d(kspace, self.grid_params, self.kernel, self.traj)
 
     def grid_FT(self, data):
-        kspace = self.grid_method.grid_2d(data, self.grid_params, self.kernel, self.traj, self.dens)
+        kspace = self.grid_method.grid_2d(
+            data, self.grid_params, self.kernel, self.traj, self.dens)
 
         # pl.imshow(np.log(abs(kspace)))
         # pl.show()
@@ -118,11 +124,11 @@ if __name__ == "__main__":
 
     im1 = gridder.grid_FT(data)
 
-    diff = abs(im)/abs(im1)
-    center = diff.shape[0]/2
+    diff = abs(im) / abs(im1)
+    center = diff.shape[0] / 2
 
     pl.figure()
-    pl.plot(diff[center,:])
+    pl.plot(diff[center, :])
 
     pl.figure()
     # pl.imshow(abs(im)/abs(im1), cmap=pl.gray())

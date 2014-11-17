@@ -57,6 +57,7 @@ def kaiser_bessel2(kwidth, grid_mod, over_samp, imsize=128):
     # pl.show()
 
     fx = np.arange(imsize*over_samp)
+    
     fx = fx - imsize*over_samp/2
     fx = fx / imsize * 1.5
     # print fx
